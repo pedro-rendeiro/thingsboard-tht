@@ -34,7 +34,7 @@ uint8_t leds_control[] = { 26, 25, 33 };
 // DHT object
 DHTesp dht;
 // ESP32 pin used to query DHT22
-#define DHT_PIN 35
+#define DHT_PIN 27
 
 // Main application loop delay
 int quant = 20;
