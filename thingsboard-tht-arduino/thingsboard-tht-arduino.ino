@@ -33,7 +33,7 @@ uint8_t leds_control[] = { 26, 25, 33 };
 
 // DHT object
 DHTesp dht;
-// ESP32 pin used to query DHT22
+// ESP32 pin used to query DHT11
 #define DHT_PIN 27
 
 // Main application loop delay
@@ -88,7 +88,7 @@ RPC_Response processSetGpioState(const RPC_Data &data)
 {
   Serial.println("Received the set GPIO RPC method");
 
-  int pin = data["pin"];
+  int pin = (int)data["pin"] - 1;
   bool enabled = data["enabled"];
 
   if (pin < COUNT_OF(leds_control)) {
@@ -128,7 +128,7 @@ void setup() {
   }
 
   // Initialize temperature sensor
-  dht.setup(DHT_PIN, DHTesp::DHT22);
+  dht.setup(DHT_PIN, DHTesp::DHT11);
 }
 
 // Main application loop
@@ -184,7 +184,7 @@ void loop() {
     subscribed = true;
   }
 
-  // Check if it is a time to send DHT22 temperature and humidity
+  // Check if it is a time to send DHT11 temperature and humidity
   if (send_passed > send_delay) {
     Serial.println("Sending data...");
 
@@ -195,9 +195,6 @@ void loop() {
     TempAndHumidity lastValues = dht.getTempAndHumidity();    
     if (isnan(lastValues.humidity) || isnan(lastValues.temperature)) {
       Serial.println("Failed to read from DHT sensor!");
-      Serial.println("Sending fake data");
-      tb.sendTelemetryFloat("temperature", 25.0);
-      tb.sendTelemetryFloat("humidity", 80.0);
     } else {
       tb.sendTelemetryFloat("temperature", lastValues.temperature);
       tb.sendTelemetryFloat("humidity", lastValues.humidity);
